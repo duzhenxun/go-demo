@@ -1,0 +1,95 @@
+package main
+
+import (
+	"context"
+	"errors"
+	"flag"
+	"fmt"
+	"go-demo/grpc/proto/hello"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
+	"log"
+	"net"
+)
+
+var (
+	port = flag.Int("port", 5000, "listening port")
+)
+
+func main() {
+	//解析传入参数
+	flag.Parse()
+
+	//注册可用服务,服务中的fun1需要token验证,fun2可以直接访问
+	grpcServer := grpc.NewServer()
+	hello.RegisterHelloServiceServer(grpcServer, &helloService{})
+
+	//监听端口
+	log.Printf("starting  service at %d", *port)
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", *port))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	grpcServer.Serve(lis)
+}
+
+// used to implement hello.HelloServiceServer.
+type helloService struct {
+}
+
+//需要token认证
+func (this *helloService) Fun1(ctx context.Context, in *hello.Request) (*hello.Response, error) {
+	auth := Auth{}
+	if err := auth.Check(ctx); err != nil {
+		return &hello.Response{Message: err.Error()}, nil
+	}
+	fmt.Println("name:%v", in.Name)
+	return &hello.Response{Message: "fun1 hello " + in.Name}, nil
+}
+
+//直接可以访问
+func (this *helloService) Fun2(ctx context.Context, in *hello.Request) (*hello.Response, error) {
+	fmt.Println("name:%v", in.Name)
+	return &hello.Response{Message: "fun2 hello " + in.Name}, nil
+}
+
+type Auth struct {
+	appKey    string
+	appSecret string
+}
+
+func (a *Auth) Check(ctx context.Context) error {
+	md, ok := metadata.FromIncomingContext(ctx)
+
+	fmt.Println(md)
+
+	if !ok {
+		return status.Errorf(codes.Unauthenticated, "metadata.FromIncomingContext err")
+	}
+	var (
+		appKey    string
+		appSecret string
+	)
+	if value, ok := md["app_key"]; ok {
+		appKey = value[0]
+	}
+	if value, ok := md["app_secret"]; ok {
+		appSecret = value[0]
+	}
+
+	if appKey != a.GetAppKey() || appSecret != a.GetAppSecret() {
+		return errors.New("Token有误!")
+	}
+
+	return nil
+}
+
+func (a *Auth) GetAppKey() string {
+	return "duzhenxun"
+}
+
+func (a *Auth) GetAppSecret() string {
+	return "password"
+}

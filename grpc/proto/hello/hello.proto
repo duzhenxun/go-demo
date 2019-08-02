@@ -1,0 +1,17 @@
+syntax = "proto3";
+//protoc --go_out=plugins=grpc:. ./hello/*.proto
+
+package hello;
+
+service HelloService {
+    rpc Fun1 (Request) returns (Response);
+    rpc Fun2 (Request) returns (Response);
+}
+
+message Request {
+    string name = 1;
+}
+
+message Response{
+    string message =1;
+}
