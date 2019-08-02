@@ -11,7 +11,7 @@ import (
 
 //go run client/hello/main.go -addr=127.0.0.1:5001 -name=asdfasdf
 
-var addr = flag.String("addr", "127.0.0.1:5000", "register address")
+var addr = flag.String("addr", "127.0.0.1:9080", "register address")
 var name = flag.String("name", "duzhenxun", "要发送的名称")
 
 

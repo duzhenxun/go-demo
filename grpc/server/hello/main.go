@@ -1,5 +1,34 @@
 package main
 
+/**
+如果不方便运行客户端代码.直接使用grpcurl 也挺方便
+➜  ~ grpcurl -plaintext 127.0.0.1:9080 list
+grpc.reflection.v1alpha.ServerReflection
+hello.HelloService
+➜  ~ grpcurl -plaintext 127.0.0.1:9080 list hello.HelloService
+hello.HelloService.Fun1
+hello.HelloService.Fun2
+➜  ~ grpcurl -plaintext 127.0.0.1:9080 describe hello.HelloService.Fun1
+hello.HelloService.Fun1 is a method:
+rpc Fun1 ( .hello.Request ) returns ( .hello.Response );
+➜  ~ grpcurl -plaintext 127.0.0.1:9080 describe hello.Request
+hello.Request is a message:
+message Request {
+  string name = 1;
+}
+➜  ~ grpcurl -plaintext 127.0.0.1:9080 describe hello.HelloService.Fun2
+hello.HelloService.Fun2 is a method:
+rpc Fun2 ( .hello.Request ) returns ( .hello.Response );
+➜  ~ grpcurl -plaintext -d '{"name": "gopher"}' 127.0.0.1:9080 hello.HelloService.Fun1
+{
+  "message": "Token有误!"
+}
+➜  ~ grpcurl -plaintext -d '{"name": "gopher"}' 127.0.0.1:9080 hello.HelloService.Fun2
+{
+  "message": "fun2 hello gopher"
+}
+```
+ */
 import (
 	"context"
 	"errors"
@@ -10,6 +39,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 )
@@ -32,6 +62,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	// Register reflection service on gRPC server.
+	reflection.Register(grpcServer)
+
 	grpcServer.Serve(lis)
 }
 
@@ -45,13 +78,19 @@ func (this *helloService) Fun1(ctx context.Context, in *hello.Request) (*hello.R
 	if err := auth.Check(ctx); err != nil {
 		return &hello.Response{Message: err.Error()}, nil
 	}
-	fmt.Println("name:%v", in.Name)
+	//设置时间防止客户端已断开,服务端还在傻傻的执行
+	//https://book.eddycjy.com/golang/grpc/deadlines.html
+	if ctx.Err()==context.Canceled{
+		return nil, errors.New("客户端已断开")
+	}
+	fmt.Printf("fun1 name:%v\n",in.Name)
 	return &hello.Response{Message: "fun1 hello " + in.Name}, nil
 }
 
 //直接可以访问
 func (this *helloService) Fun2(ctx context.Context, in *hello.Request) (*hello.Response, error) {
-	fmt.Println("name:%v", in.Name)
+
+	fmt.Printf("fun2 name:%v\n",in.Name)
 	return &hello.Response{Message: "fun2 hello " + in.Name}, nil
 }
 
@@ -62,8 +101,6 @@ type Auth struct {
 
 func (a *Auth) Check(ctx context.Context) error {
 	md, ok := metadata.FromIncomingContext(ctx)
-
-	fmt.Println(md)
 
 	if !ok {
 		return status.Errorf(codes.Unauthenticated, "metadata.FromIncomingContext err")
