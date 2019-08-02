@@ -34,6 +34,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"go-demo/consul"
 	"go-demo/grpc/proto/hello"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -42,6 +43,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
+	"time"
 )
 
 var (
@@ -65,8 +67,33 @@ func main() {
 	// Register reflection service on gRPC server.
 	reflection.Register(grpcServer)
 
+
+	// 注册到concul中
+/*	if err = consul.Register("test.hello.fun1", "10.70.120.63", *port, "10.70.120.63:8500", time.Second*10, 15);err!=nil{
+		panic(err)
+	}
+	if err = consul.Register("test.hello.fun2", "10.70.120.63", *port, "10.70.120.63:8500", time.Second*10, 15);err!=nil{
+		panic(err)
+	}*/
+
 	grpcServer.Serve(lis)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // used to implement hello.HelloServiceServer.
 type helloService struct {
