@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package wms_truck_task;
+// protoc -I ./proto/wms_truck_task --go_out=plugins=grpc:./proto/wms_truck_task ./proto/wms_truck_task/truck_task_gen.proto
+service TruckTaskService {
+
+    //创建
+    rpc CreateTruckTask(TruckTask) returns (EntityResult) {
+    }
+    //1. 按照查询条件更新，查询可以按照实体查询和sql查询，二选一，sql查询优先使用，
+    // 2.如果field对应为空值，则需要在 query_empty_fields 中声明，如果要更新的是默认值 请使用update_empty_fields
+    rpc UpdateTruckTask (UpdateAndCondition) returns (Result) {
+    }
+    //1. 按照条件查询当个实体，查询可以按照实体查询和sql查询，二选一，sql查询优先使用，
+    // 2.如果field对应为空值，则需要在 query_empty_fields 中声明
+    // 3.增加读写库查询判断
+    rpc GetTruckTask (Query) returns (EntityResult) {
+    }
+    //1. 按照条件查询列表，查询可以按照实体查询和sql查询，二选一，sql查询优先使用，
+    // 2.如果field对应为空值，则需要在 query_empty_fields 中声明
+    // 3.增加读写库查询判断
+    rpc GetTruckTaskList (Query) returns (ListResult) {
+    }
+    //1. 按照条件删除，查询可以按照实体查询和sql查询，二选一，sql查询优先使用，
+    // 2.如果field对应为空值，则需要在 query_empty_fields 中声明
+    rpc DeleteTruckTask (Query) returns (Result) {
+    }
+    //1. 按照条件查询，查询可以按照实体查询和sql查询，二选一，sql查询优先使用，
+    // 2.如果field对应为空值，则需要在 query_empty_fields 中声明
+    // 3.增加读写库查询判断
+    rpc GetTruckTaskPageList (PageQuery) returns (PageResult) {
+    }
+    //1. 按照条件查询数量，数量值为result.data，查询可以按照实体查询和sql查询，二选一，sql查询优先使用，
+    // 2.如果field对应为空值，则需要在 query_empty_fields 中声明
+    // 3.增加读写库查询判断
+    rpc GetTruckTaskCount (Query) returns (Result) {
+    }
+}
+
+//主从库
+enum DB {
+    //读库
+    READ = 0;
+    //写库
+    WRITE = 1;
+}
+
+message TruckTask {
+    int32 id = 1;
+    string task_no = 2;
+    string tms_trans_id = 3;
+    int32 task_state = 4;
+    string truck_no = 5;
+    string truck_name = 6;
+    string truck_image = 7;
+    string driver_name = 8;
+    string driver_mobile = 9;
+    string driver_name1 = 10;
+    string driver_mobile1 = 11;
+    int32 task_option = 12;
+    string exec_time = 13;
+    string trans_path = 14;
+    int32 start_repository_id = 15;
+    int32 arrive_repository_id = 16;
+    string operator = 17;
+    string create_time = 18;
+    string update_time = 19;
+    
+}
+
+message Result {
+    int32 code = 1;
+    string msg = 2;
+    string data = 3;
+}
+
+// 按条件更新数据
+message UpdateAndCondition {
+    // 更新数据，如果filed对应为空值，则需要在 update_empty_fields 中声明
+    TruckTask entity = 1;
+    //查询条件
+    Query query = 2;
+    // 需要赋空值的字段
+    repeated string update_empty_fields = 3;
+
+}
+
+//按条件查询
+message Query {
+    // 按照实体查询 （和sql查询二选一，sql查询优先使用），如果field对应为空值，则需要在 query_empty_fields 中声明
+    TruckTask entity_query = 1;
+    // 按照sql查询（和实体查询二选一，sql查询优先使用），如果field对应为空值，则需要在 query_empty_fields 中声明
+    // "id=1 and status in(3,4) and createtime >'2018' "
+    string sql_query = 2;
+
+    // 用空值当检索条件的字段
+    repeated string query_empty_fields = 3;
+    //排序条件 ["id":"desc","create_time":asc"]
+    map<string, string> order_by = 4;
+    //是否查询主库，默认不读取 DB.READ
+    DB db = 5;
+}
+
+//分页查询
+message PageQuery {
+    //查询条件
+    Query query = 1;
+    int32 page = 2;
+    int32 page_num = 3;
+}
+
+message EntityResult {
+    int32 code = 1;
+    string msg = 2;
+    TruckTask data = 3;
+}
+
+message ListResult {
+    int32 code = 1;
+    string msg = 2;
+    repeated TruckTask data = 3;
+}
+
+message PageResult {
+    int32 code = 1;
+    string msg = 2;
+    TruckTaskPageData data = 3;
+}
+
+message TruckTaskPageData {
+    int32 current_page = 1;
+    int32 count = 2;
+    repeated TruckTask list = 3;
+}
+

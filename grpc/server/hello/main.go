@@ -28,7 +28,7 @@ rpc Fun2 ( .hello.Request ) returns ( .hello.Response );
   "message": "fun2 hello gopher"
 }
 ```
- */
+*/
 import (
 	"context"
 	"errors"
@@ -65,33 +65,17 @@ func main() {
 	// Register reflection service on gRPC server.
 	reflection.Register(grpcServer)
 
-
 	// 注册到concul中
-/*	if err = consul.Register("test.hello.fun1", "10.70.120.63", *port, "10.70.120.63:8500", time.Second*10, 15);err!=nil{
-		panic(err)
-	}
-	if err = consul.Register("test.hello.fun2", "10.70.120.63", *port, "10.70.120.63:8500", time.Second*10, 15);err!=nil{
-		panic(err)
-	}*/
+	/*	if err = consul.Register("test.hello.fun1", "10.70.120.63", *port, "10.70.120.63:8500", time.Second*10, 15);err!=nil{
+			panic(err)
+		}
+		if err = consul.Register("test.hello.fun2", "10.70.120.63", *port, "10.70.120.63:8500", time.Second*10, 15);err!=nil{
+			panic(err)
+		}*/
 
 	grpcServer.Serve(lis)
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // used to implement hello.HelloServiceServer.
 type helloService struct {
@@ -105,17 +89,17 @@ func (this *helloService) Fun1(ctx context.Context, in *hello.Request) (*hello.R
 	}
 	//设置时间防止客户端已断开,服务端还在傻傻的执行
 	//https://book.eddycjy.com/golang/grpc/deadlines.html
-	if ctx.Err()==context.Canceled{
+	if ctx.Err() == context.Canceled {
 		return nil, errors.New("客户端已断开")
 	}
-	fmt.Printf("fun1 name:%v\n",in.Name)
+	fmt.Printf("fun1 name:%v\n", in.Name)
 	return &hello.Response{Message: "fun1 hello " + in.Name}, nil
 }
 
 //直接可以访问
 func (this *helloService) Fun2(ctx context.Context, in *hello.Request) (*hello.Response, error) {
 
-	fmt.Printf("fun2 name:%v\n",in.Name)
+	fmt.Printf("fun2 name:%v\n", in.Name)
 	return &hello.Response{Message: "fun2 hello " + in.Name}, nil
 }
 
@@ -126,6 +110,8 @@ type Auth struct {
 
 func (a *Auth) Check(ctx context.Context) error {
 	md, ok := metadata.FromIncomingContext(ctx)
+
+	fmt.Println(md)
 
 	if !ok {
 		return status.Errorf(codes.Unauthenticated, "metadata.FromIncomingContext err")
@@ -142,7 +128,7 @@ func (a *Auth) Check(ctx context.Context) error {
 	}
 
 	if appKey != a.GetAppKey() || appSecret != a.GetAppSecret() {
-		return errors.New("Token有误!")
+		return errors.New("Token is !")
 	}
 
 	return nil
