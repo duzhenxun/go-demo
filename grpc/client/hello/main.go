@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-//go run client/hello/main.go -addr=127.0.0.1:5001 -name=asdfasdf
+//go run client/hello/main.go -addr=127.0.0.1:5000 -name=asdfasdf
 
-var addr = flag.String("addr", "127.0.0.1:9080", "register address")
+var addr = flag.String("addr", "10.70.30.121:9080", "register address")
 var name = flag.String("name", "duzhenxun", "要发送的名称")
 
 func main() {
@@ -30,6 +30,7 @@ func main() {
 
 	//正常grpc常连
 	conn, err := grpc.Dial(*addr, grpc.WithInsecure(), grpc.WithPerRPCCredentials(&auth),grpc.WithAuthority("service1"))
+
 	if err != nil {
 		fmt.Println(err.Error())
 	}

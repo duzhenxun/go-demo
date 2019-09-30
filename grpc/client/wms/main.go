@@ -3,26 +3,22 @@ package main
 import (
 	"context"
 	"fmt"
-	"go-demo/grpc/proto/wms_truck_task"
+	"go-demo/grpc/proto/wms_repository"
 	"google.golang.org/grpc"
 )
 
-func main()  {
-	//addr:="feature1-service-uwms.fat.n.com:8000"  //this is ok~
-	addr:="10.70.120.79:9080"
-	conn,err:=grpc.Dial(addr,grpc.WithInsecure(),grpc.WithAuthority("wms"))
+func main() {
+	addr := "10.70.30.121:9080"
+	conn, err := grpc.Dial(addr, grpc.WithInsecure(), grpc.WithAuthority("wms"))
 
-	if err!=nil{
-		fmt.Println("conn fail")
-		fmt.Println(err)
-	}
+	//addr := "service-uwms.fat.n.com:8000"
+	// conn, err := grpc.Dial(addr, grpc.WithInsecure())
+
 	defer conn.Close()
-
-	c:=wms_truck_task.NewTruckTaskServiceClient(conn)
-	request,err:=c.GetTruckTask(context.Background(),&wms_truck_task.Query{SqlQuery:"id=456"})
-	if err !=nil{
-		fmt.Println("GetTruckTask fail")
-		fmt.Println(err)
+	client := wms_repository.NewRepositoryServiceClient(conn)
+	request, err := client.GetRepository(context.Background(), &wms_repository.Query{SqlQuery: "id=456"})
+	if err != nil {
+		fmt.Println("fail:",err)
 	}
-	fmt.Println(request)
+	fmt.Println("ok",request)
 }
