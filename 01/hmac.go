@@ -2,19 +2,24 @@ package main
 
 import (
 	"crypto/hmac"
-	"crypto/md5"
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 )
 
-
-
 func main() {
-	src := []byte("hello")
-	secret := []byte("123456")
 
-	hasher := hmac.New(md5.New, secret)
-	hasher.Write(src)
-	mac := hasher.Sum(nil)
-	fmt.Printf("%x", mac)
-	//68656c6c6fac28d602c767424d0c809edebf73828bed5ce99ce1556f4df8e223faeec60edd
+	token:=hmacSha256("duzhenxun", "123456")
+
+	fmt.Println(token)
+}
+
+//php > echo base64_encode(hash_hmac('sha256','hello','duzhenxun'));
+//ZWZkZWM2OGUyNDBiOTg5MDY3ZWQ2ZjAwOGZmOGNhNjQ4ZTA1NTYzYTU2NmZiZTJhMGQ2MzM0MGNjNjM2MGJmNg==
+func hmacSha256(src string, secret string) string {
+	h := hmac.New(sha256.New, []byte(secret))
+	h.Write([]byte(src))
+	shaStr:= fmt.Sprintf("%x",h.Sum(nil))
+	//shaStr:=hex.EncodeToString(h.Sum(nil))
+	return base64.StdEncoding.EncodeToString([]byte(shaStr))
 }
