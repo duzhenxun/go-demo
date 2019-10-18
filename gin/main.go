@@ -3,13 +3,15 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 func main()  {
 	r := gin.Default()
-	r.StaticFS("/ui", http.Dir("./ui"))
+	r.StaticFS("/ui", http.Dir("./ui/dist"))
 
 	r.GET("/ping", func(c *gin.Context) {
+		time.Sleep(time.Second*2)
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})

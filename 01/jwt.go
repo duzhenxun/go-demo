@@ -12,20 +12,18 @@ import (
 
 func main() {
 	//jwt.io 密钥 123456 注意payload的字符串要与官网一样
-	jwtIo:="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.mUC1eX0GwtVeRxXr5a2LvCHrSLMu1YfQ5eXwV5RH5M8"
-	payload:=map[string]interface{}{"iat": 1516239022, "name": "John Doe", "sub": "1234567890"}
+	payload:=map[string]interface{}{"key":"ado"}
+	secret:="123456"
 	p, _ := json.Marshal(payload)
-	fmt.Println(jwtEncode(string(p),"123456"))
-	t, _ := jwt.Encode(payload, []byte("123456"), "HS256")
+	token:=jwtEncode(string(p),secret)
+	fmt.Println(token)
+
+	t, _ := jwt.Encode(payload, []byte(secret), "HS256")
 	fmt.Println(string(t))
-	fmt.Println(jwtIo)
 }
 
 func jwtEncode(payload string, secret string) string {
-	header, _ := json.Marshal(map[string]interface{}{
-		"typ": "JWT",
-		"alg": "HS256",
-	})
+	header:=`{"alg":"HS256","typ":"JWT"}`
 	segments := [3]string{}
 	segments[0] = base64url_encode(string(header))
 	segments[1] = base64url_encode(payload)
@@ -48,3 +46,4 @@ func base64url_encode(b string) string {
 	}
 	return encoded
 }
+
