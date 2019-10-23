@@ -6,20 +6,17 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"go-demo/01/jwt"
 	"strings"
 )
 
 func main() {
 	//jwt.io 密钥 123456 注意payload的字符串要与官网一样
-	payload:=map[string]interface{}{"key":"ado"}
+	//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZ2UiOjIwLCJuYW1lIjoiZHV6aGVueHVuIn0.Ddh8knTN5SgLFuk4_04sijv8i906xtzGpjkhJEaaBcA
+	payload:=map[string]interface{}{"age":20,"name":"duzhenxun"}
 	secret:="123456"
 	p, _ := json.Marshal(payload)
 	token:=jwtEncode(string(p),secret)
 	fmt.Println(token)
-
-	t, _ := jwt.Encode(payload, []byte(secret), "HS256")
-	fmt.Println(string(t))
 }
 
 func jwtEncode(payload string, secret string) string {
