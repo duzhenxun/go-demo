@@ -1,12 +1,17 @@
 package main
 
 import (
+	"database/sql"
+	"flag"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+	_ "github.com/go-sql-driver/mysql"
 )
-
+var addr = flag.String("addr", ":8080", "register address")
 func main()  {
+	flag.Parse()
 	r := gin.Default()
 	r.StaticFS("/ui", http.Dir("./ui/dist"))
 
@@ -16,6 +21,43 @@ func main()  {
 			"message": "pong",
 		})
 	})
+	r.GET("/mysql", mysql)
 
-	r.Run() // listen and serve on 0.0.0.0:8080
+	r.Run(*addr) // listen and serve on 0.0.0.0:8080
+}
+
+
+
+func mysql(c *gin.Context)  {
+	db,err := sql.Open("mysql","dy:dy@tcp(127.0.0.1:3306)/dy?charset=utf8");
+	if err != nil{
+		fmt.Printf("connect mysql fail ! [%s]",err)
+	}else{
+		fmt.Println("connect to mysql success")
+	}
+
+	rows,err := db.Query("select admin_id,admin_name from mac_admin");
+	if err != nil{
+		fmt.Printf("select fail [%s]",err)
+	}
+
+	var mapUser map[string]int
+	mapUser = make(map[string]int)
+
+	for rows.Next(){
+		var id int
+		var username string
+		rows.Columns()
+		err := rows.Scan(&id,&username)
+		if err != nil{
+			fmt.Printf("get user info error [%s]",err)
+		}
+		mapUser[username] = id
+	}
+
+	for k,v := range mapUser{
+		fmt.Println(k,v);
+	}
+
+	db.Close()
 }
