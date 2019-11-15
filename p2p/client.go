@@ -21,7 +21,7 @@ func main() {
 	}
 	// 当前进程标记字符串,便于显示
 	tag = os.Args[1]
-	srcAddr := &net.UDPAddr{IP: net.IPv4zero, Port: 9901} // 注意端口必须固定
+	srcAddr := &net.UDPAddr{IP: net.IPv4zero, Port: 9902} // 注意端口必须固定
 	dstAddr := &net.UDPAddr{IP: net.ParseIP("211.159.168.190"), Port: 9527}
 	conn, err := net.DialUDP("udp", srcAddr, dstAddr)
 	if err != nil {
@@ -50,6 +50,7 @@ func parseAddr(addr string) net.UDPAddr {
 	}
 }
 func bidirectionHole(srcAddr *net.UDPAddr, anotherAddr *net.UDPAddr) {
+	time.Sleep(3 * time.Second)
 	conn, err := net.DialUDP("udp", srcAddr, anotherAddr)
 	if err != nil {
 		fmt.Println(err)
@@ -61,8 +62,8 @@ func bidirectionHole(srcAddr *net.UDPAddr, anotherAddr *net.UDPAddr) {
 	}
 	go func() {
 		for {
-			time.Sleep(10 * time.Second)
-			if _, err = conn.Write([]byte("from [" + tag + "]")); err != nil {
+			time.Sleep(1 * time.Second)
+			if _, err = conn.Write([]byte("from [" + tag + "]"+fmt.Sprint(srcAddr))); err != nil {
 				log.Println("send msg fail", err)
 			}
 		}
