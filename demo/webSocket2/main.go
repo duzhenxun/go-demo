@@ -29,7 +29,7 @@ func main() {
 	http.HandleFunc("/ws", wsHandler)
 	http.HandleFunc("/api", apiHandler)
 	if err:=http.ListenAndServe(*addr, nil);err!=nil{
-		log.Println(err.Error())
+		log.Println("启动失败！ "+err.Error())
 	}else{
 		log.Println(*addr)
 	}
