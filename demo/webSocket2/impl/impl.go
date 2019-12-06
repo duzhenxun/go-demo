@@ -2,6 +2,7 @@ package impl
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"sync"
 )
@@ -49,7 +50,8 @@ func (conn *Connection) readLoop() {
 		err  error
 	)
 	for {
-		if _, data, err = conn.wsConnect.ReadMessage(); err != nil {
+		fmt.Println(conn.wsConnect.RemoteAddr())
+		if  _, data, err = conn.wsConnect.ReadMessage();err != nil {
 			goto ERR
 		}
 		select {
@@ -60,7 +62,9 @@ func (conn *Connection) readLoop() {
 	}
 
 ERR:
+	fmt.Println(conn.wsConnect.RemoteAddr(),"退出...")
 	conn.Close()
+
 }
 
 func (conn *Connection) writeLoop() {
@@ -81,6 +85,11 @@ func (conn *Connection) writeLoop() {
 
 ERR:
 	conn.Close()
+}
+
+func (conn *Connection) GetConnClosed() bool {
+	b := conn.isClosed
+	return b
 }
 
 func InitConnection(wsConn *websocket.Conn) (conn *Connection, err error) {

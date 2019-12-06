@@ -27,15 +27,19 @@ var (
 func main() {
 	flag.Parse()
 	http.HandleFunc("/ws", wsHandler)
-	http.HandleFunc("/api", apiHandler)
-	if err:=http.ListenAndServe(*addr, nil);err!=nil{
-		log.Println("启动失败！"+err.Error())
+	http.HandleFunc("/api/sendMsg", apiHandler)
+	if err := http.ListenAndServe(*addr, nil); err != nil {
+		log.Println("启动失败！" + err.Error())
 	}
 }
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
+
+	room = r.URL.Query().Get("room")
+
 	// 完成ws协议的握手操作
 	wsConnect, err := upgrader.Upgrade(w, r, nil);
+
 	if err != nil {
 		return
 	}
@@ -45,42 +49,36 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	for {
 		//接收用户发来信息，回复信息
-		/*data, err := wsConn.ReadMessage()
-		if err != nil {
-			wsConn.Close()
-		}
-		fmt.Println(data)*/
-		//wsConn.WriteMessage(data)
-
-		//fmt.Println(len(content))
-		if len(content) > 0 {
+		close := wsConn.GetConnClosed()
+		if len(content) > 0 && close !=true {
 			mu.Lock()
 			var msg = content
 			content = make([]string, 0)
 			mu.Unlock()
 			for _, v := range msg {
-
 				if err := wsConn.WriteMessage([]byte(v)); err != nil {
 					wsConn.Close()
 				}
+				time.Sleep(100 * time.Millisecond)
 			}
+
 		} else {
-			//wsConn.WriteMessage([]byte("还没有信息"))
-			time.Sleep(1*time.Second)
+			time.Sleep(1 * time.Second)
 		}
 	}
 }
 
+//api写数据
 func apiHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	room = r.PostFormValue("room")
 	content = append(content, r.PostFormValue("content"))
-	if len(content) > 5 {
-		content = content[:5]
+	if len(content) > 10 {
+		content = content[:10]
 	}
 	mu.Unlock()
 	result := map[string]string{
-		"code": "1", "msg": fmt.Sprintf("ok,当前信息数量:%v",len(content)),
+		"code": "1", "msg": fmt.Sprintf("ok,当前信息数量:%v", len(content)),
 	}
 	res, _ := json.Marshal(result)
 	w.Write(res)
