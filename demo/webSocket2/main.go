@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"go-demo/demo/webSocket2/impl"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -27,7 +28,11 @@ func main() {
 	flag.Parse()
 	http.HandleFunc("/ws", wsHandler)
 	http.HandleFunc("/api", apiHandler)
-	http.ListenAndServe(*addr, nil)
+	if err:=http.ListenAndServe(*addr, nil);err!=nil{
+		log.Println(err.Error())
+	}else{
+		log.Println(*addr)
+	}
 }
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
