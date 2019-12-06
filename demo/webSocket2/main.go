@@ -59,7 +59,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 			content = make([]string, 0)
 			mu.Unlock()
 			for _, v := range msg {
-				time.Sleep(1*time.Second)
+
 				if err := wsConn.WriteMessage([]byte(v)); err != nil {
 					wsConn.Close()
 				}
