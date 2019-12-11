@@ -9,6 +9,7 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/hashicorp/consul/api v1.2.0
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
-	golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c
+	github.com/spf13/viper v1.6.1
+	golang.org/x/net v0.0.0-20190522155817-f3200d17e092
 	google.golang.org/grpc v1.23.1
 )
