@@ -5,9 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	"time"
-	_ "github.com/go-sql-driver/mysql"
 )
 var addr = flag.String("addr", ":8080", "register address")
 func main()  {
@@ -21,6 +21,10 @@ func main()  {
 			"message": "pong",
 		})
 	})
+	r.GET("/test",func(c *gin.Context){
+		fmt.Println(c.GetQuery("abc"))
+
+	})
 	r.GET("/mysql", mysql)
 
 	r.Run(*addr) // listen and serve on 0.0.0.0:8080
@@ -29,6 +33,7 @@ func main()  {
 
 
 func mysql(c *gin.Context)  {
+
 	db,err := sql.Open("mysql","dy:dy@tcp(127.0.0.1:3306)/dy?charset=utf8");
 	if err != nil{
 		fmt.Printf("connect mysql fail ! [%s]",err)
