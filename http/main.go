@@ -11,7 +11,7 @@ import (
 func main() {
 	http.HandleFunc("/log", func(writer http.ResponseWriter, request *http.Request) {
 		fileName := "http.log"
-		f, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE,0666)
+		f, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND,0666)
 		defer f.Close()
 		if err != nil {
 			panic(err)
