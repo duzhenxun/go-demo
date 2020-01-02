@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-//go run main.go -startPort 1 -endPort 50000 -process 1000 -host kongadmin.com -timeout 100
+//go run main.go -startPort 1 -endPort 50000 -ce 1000 -host kongadmin.com -timeout 100
 func main() {
 	ip := flag.String("ip", "127.0.0.1", "ip地址如： 192.168.0.1-255 或直接输入域名 kongadmin.com")
 	startPort := flag.Int("startPort", 80, "开始端口号如：-start 80 ")
@@ -39,6 +39,7 @@ func main() {
 	fileName:=*path+"/"+*ip+"_port.txt"
 
 	for i := 0; i < len(hosts); i++ {
+		fmt.Println("---------------------- START -----------------------------")
 		ports:=scanIP.getHostOpenPort(hosts[i], *startPort, *endPort, *timeout, *process)
 		if len(ports)>0{
 			f, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND,0666)
@@ -53,6 +54,7 @@ func main() {
 				continue
 			}
 		}
+		fmt.Println("---------------------- END -----------------------------")
 	}
 
 	fmt.Printf("========== %v 所有操作完成，总执行时长：%.2fs \n", time.Now().Format("2016-01-02 15:04:05"), time.Since(start).Seconds())
@@ -124,12 +126,12 @@ func (s *ScanIp) getHostOpenPort(host string, startPort int, endPort int, timeou
 			ports = append(ports, tmpPorts...)
 			mutex.Unlock()
 			if len(tmpPorts) > 0 {
-				//fmt.Printf("协程%v 执行完成，总执行时长： %.2fs，开放端口： %v \n", key, time.Since(start).Seconds(), tmpPorts)
+				fmt.Printf("%v【%v】协程%v 执行完成，时长： %.2fs，开放端口： %v \n",time.Now().Format("2006-01-02 15:04:05"), host, key, time.Since(start).Seconds(), tmpPorts)
 			}
 		}(v, k)
 	}
 	wg.Wait()
-	fmt.Printf("%v【%v】总执行时长%.2fs , 开放的端口:%v\n", time.Now().Format("2006-01-02 15:04:05"), host, time.Since(start).Seconds(), ports)
+	fmt.Printf("%v【%v】执行时长%.2fs , 所有开放的端口:%v\n", time.Now().Format("2006-01-02 15:04:05"), host, time.Since(start).Seconds(), ports)
 	return ports
 }
 
