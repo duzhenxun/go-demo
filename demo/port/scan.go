@@ -15,12 +15,13 @@ import (
 
 //go run main.go -startPort 1 -endPort 50000 -ce 1000 -host kongadmin.com -timeout 100
 func main() {
+	//
 	startTime := time.Now()
-	ip := flag.String("ip", "127.0.0.1", "ip地址 例如:-ip 192.168.0.1-255 或直接输入域名 kongadmin.com")
-	port := flag.String("p", "80", "端口号范围 例如:-p 80,81,88-1000")
-	path := flag.String("path", "log", "日志地址 例如:-path log")
-	timeout := flag.Int("t", 200, "超时时长(毫秒) 例如:-t 200")
-	process := flag.Int("n", 100, "进程数 例如:-n 10")
+	ip := flag.String("ip", "127.0.0.1", "ip地址 例如:-ip=192.168.0.1-255 或直接输入域名 kongadmin.com")
+	port := flag.String("p", "80", "端口号范围 例如:-p=80,81,88-1000")
+	path := flag.String("path", "log", "日志地址 例如:-path=log")
+	timeout := flag.Int("t", 200, "超时时长(毫秒) 例如:-t=200")
+	process := flag.Int("n", 100, "进程数 例如:-n=10")
 	h := flag.Bool("h", false, "帮助信息")
 	flag.Parse()
 
@@ -76,6 +77,7 @@ func main() {
 		}
 	}
 	fmt.Printf("========== End %v 总执行时长：%.2fs ================ \n", time.Now().Format("2006-01-02 15:04:05"), time.Since(startTime).Seconds())
+
 }
 
 //ip 扫描
@@ -99,8 +101,7 @@ func (s *ScanIp) getIpOpenPort(ip string, port string) []int {
 		pageCount int
 		num       int
 		openPorts []int
-
-		mutex sync.Mutex
+		mutex     sync.Mutex
 	)
 	ports, _ := s.getAllPort(port)
 	total = len(ports)
@@ -125,7 +126,6 @@ func (s *ScanIp) getIpOpenPort(ip string, port string) []int {
 
 	wg := sync.WaitGroup{}
 	for k, v := range all {
-		// time.Sleep(time.Millisecond*100)
 		wg.Add(1)
 		go func(value []int, key int) {
 			defer wg.Done()
@@ -149,6 +149,7 @@ func (s *ScanIp) getIpOpenPort(ip string, port string) []int {
 	wg.Wait()
 
 	s.sendLog(fmt.Sprintf("%v 【%v】扫描结束，执行时长%.3fs , 所有开放的端口:%v", time.Now().Format("2006-01-02 15:04:05"), ip, time.Since(start).Seconds(), openPorts))
+	time.Sleep(time.Second * 1)
 	return openPorts
 }
 
@@ -233,13 +234,15 @@ func (s *ScanIp) getAllIp(ip string) ([]string, error) {
 //查看端口号是否打开
 func (s *ScanIp) isOpen(ip string, port int) bool {
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, port), time.Millisecond*time.Duration(s.timeout))
-	if err == nil {
-		_ = conn.Close()
-		return true
-	} else {
+	if err != nil {
+		if strings.Contains(err.Error(),"too many open files"){
+			fmt.Println("连接数超出系统限制！",err.Error())
+			os.Exit(1)
+		}
 		return false
 	}
-
+	_ = conn.Close()
+	return true
 }
 
 //数组去重
