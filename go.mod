@@ -3,7 +3,8 @@ module go-demo
 go 1.13
 
 require (
-	github.com/garyburd/redigo v1.6.0 // indirect
+	github.com/andlabs/ui v0.0.0-20180902183112-867a9e5a498d
+	github.com/dontpanic92/wxGo v0.0.0-20181107055819-fbf544604121
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-redis/redis v6.15.6+incompatible
 	github.com/go-sql-driver/mysql v1.4.1
@@ -17,6 +18,7 @@ require (
 	github.com/onsi/ginkgo v1.10.1 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/spf13/viper v1.6.1
+	github.com/xs25cn/scanPort v0.0.0-20200114082402-de773d2b0349
 	golang.org/x/net v0.0.0-20190923162816-aa69164e4478
 	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
 	golang.org/x/text v0.3.2 // indirect

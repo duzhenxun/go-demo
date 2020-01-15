@@ -9,14 +9,14 @@ import (
 )
 
 func main() {
-	var port = flag.Int("port", 9527, "register port")
+	var port = flag.Int("port", 2525, "服务端开放的端口号")
 	flag.Parse()
 	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.IPv4zero, Port: *port})
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 	log.Printf("本地地址: <%s> \n", listener.LocalAddr().String())
+
 	peers := make([]net.UDPAddr, 0, 2)
 	data := make([]byte, 1024)
 	for {

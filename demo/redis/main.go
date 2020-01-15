@@ -21,15 +21,15 @@ func main() {
 	c4:=pool.Get()
 	c5:=pool.Get()
 	fmt.Println(c,c2,c3,c4,c5)
-	time.Sleep(time.Second * 5)//redis一共有多少个连接？？
-	c.Close()
+	//time.Sleep(time.Second * 5)//redis一共有多少个连接？？
+/*	c.Close()
 	c2.Close()
 	c3.Close()
 	c4.Close()
-	c5.Close()
-	time.Sleep(time.Second*5) //redis一共有多少个连接？？
+	c5.Close()*/
+	//time.Sleep(time.Second*5) //redis一共有多少个连接？？
 
-	//下次是怎么取出来的？？
+/*	//下次是怎么取出来的？？
 	b1:=pool.Get()
 	b2:=pool.Get()
 	b3:=pool.Get()
@@ -37,7 +37,7 @@ func main() {
 	time.Sleep(time.Second*5)
 	b1.Close()
 	b2.Close()
-	b3.Close()
+	b3.Close()*/
 
 	for{
 		fmt.Println("主程序运行中....")

@@ -1,5 +1,10 @@
+# github.com/andlabs/ui v0.0.0-20180902183112-867a9e5a498d
+github.com/andlabs/ui
+github.com/andlabs/ui/winmanifest
 # github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da
 github.com/armon/go-metrics
+# github.com/dontpanic92/wxGo v0.0.0-20181107055819-fbf544604121
+github.com/dontpanic92/wxGo/wx
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
 # github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3
@@ -91,6 +96,8 @@ github.com/spf13/viper
 github.com/subosito/gotenv
 # github.com/ugorji/go v1.1.4
 github.com/ugorji/go/codec
+# github.com/xs25cn/scanPort v0.0.0-20200114082402-de773d2b0349
+github.com/xs25cn/scanPort/scan
 # golang.org/x/net v0.0.0-20190923162816-aa69164e4478
 golang.org/x/net/context
 golang.org/x/net/html
