@@ -48,10 +48,12 @@ func (conn *Connection) readLoop() {
 	var (
 		data []byte
 		err  error
+		msgType int
 	)
 	for {
 		fmt.Println(conn.wsConnect.RemoteAddr())
-		if  _, data, err = conn.wsConnect.ReadMessage();err != nil {
+		if  msgType, data, err = conn.wsConnect.ReadMessage();err != nil {
+			fmt.Println(msgType,data,err)
 			goto ERR
 		}
 		select {

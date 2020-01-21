@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//go run client/hello/main.go -addr=127.0.0.1:5000 -name=asdfasdf
+//go run client/hello/bak.go -addr=127.0.0.1:5000 -name=asdfasdf
 
 var addr = flag.String("addr", "10.70.30.121:9080", "register address")
 var name = flag.String("name", "duzhenxun", "要发送的名称")

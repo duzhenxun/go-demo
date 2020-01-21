@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/gorilla/websocket"
-	"go-demo/demo/webSocket2/impl"
+	"go-demo/demo/webSocket2/sendMsg"
 	"log"
 	"net/http"
 	"sync"
@@ -13,73 +12,56 @@ import (
 )
 
 var (
-	upgrader = websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool {
-			return true
-		},
-	}
-	addr    = flag.String("addr", ":8080", "register address")
 	content = make([]string, 0) //收到的内容
-	room    string              //房间号
 	mu      sync.Mutex
+	addr    = flag.String("addr", ":8080", "register address")
 )
 
 func main() {
 	flag.Parse()
 	http.HandleFunc("/ws", wsHandler)
-	http.HandleFunc("/api/sendMsg", apiHandler)
+	http.HandleFunc("/api/send-msg", apiHandler)
 	if err := http.ListenAndServe(*addr, nil); err != nil {
-		log.Println("启动失败！" + err.Error())
+		log.Println("启动失败", err)
 	}
+
 }
-
 func wsHandler(w http.ResponseWriter, r *http.Request) {
-
-	room = r.URL.Query().Get("room")
-
-	// 完成ws协议的握手操作
-	wsConnect, err := upgrader.Upgrade(w, r, nil);
-
+	sendMsg, err := sendMsg.NewSendMsg(w, r)
 	if err != nil {
-		return
-	}
-	wsConn, err := impl.InitConnection(wsConnect)
-	if err != nil {
-		wsConn.Close()
+		sendMsg.Close()
+		fmt.Println(err)
 	}
 	for {
-		//接收用户发来信息，回复信息
-		close := wsConn.GetConnClosed()
-		if len(content) > 0 && close !=true {
+		if len(content) > 0 && sendMsg.IsClosed == false {
 			mu.Lock()
 			var msg = content
 			content = make([]string, 0)
 			mu.Unlock()
 			for _, v := range msg {
-				if err := wsConn.WriteMessage([]byte(v)); err != nil {
-					wsConn.Close()
+				if err := sendMsg.Write([]byte(v)); err != nil {
+					sendMsg.Close()
 				}
-				time.Sleep(100 * time.Millisecond)
 			}
-
-		} else {
-			time.Sleep(1 * time.Second)
 		}
+		time.Sleep(time.Second * 1)
 	}
+
 }
 
-//api写数据
+//写消息接口
 func apiHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.PostFormValue("content")
 	mu.Lock()
-	room = r.PostFormValue("room")
-	content = append(content, r.PostFormValue("content"))
+	content = append(content, c)
 	if len(content) > 10 {
 		content = content[:10]
 	}
 	mu.Unlock()
-	result := map[string]string{
-		"code": "1", "msg": fmt.Sprintf("ok,当前信息数量:%v", len(content)),
-	}
-	res, _ := json.Marshal(result)
+
+	res, _ := json.Marshal(map[string]string{
+		"code": "1",
+		"msg":  fmt.Sprintf("ok,当前信息数量:%v", len(content)),
+	})
 	w.Write(res)
 }
