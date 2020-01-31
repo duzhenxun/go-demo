@@ -22,3 +22,8 @@ func(d *Demo) Test1(v int)int{
 	return v+v
 }
 
+// 说啥返回啥
+func(d *Demo) AdoSay(s string) string{
+	return s
+}
+
