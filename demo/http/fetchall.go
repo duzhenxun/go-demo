@@ -17,7 +17,6 @@ func main()  {
 		"http://www.qq.com",
 		"http://www.58.com",
 		"http://www.0532888.cn",
-		"https://www.xin.com",
 	}*/
 	for _,url:=range urls[:len(urls)]{
 		go fetch(url,ch)

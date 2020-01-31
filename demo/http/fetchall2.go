@@ -14,7 +14,7 @@ func main() {
 		"https://www.qq.com",
 		"https://lf.58.com",
 		"http://www.0532888.cn",
-		"https://www.xin.com",
+		"https://www.x.com",
 	}
 	start := time.Now()
 	wg := sync.WaitGroup{}
