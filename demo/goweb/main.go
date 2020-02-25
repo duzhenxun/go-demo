@@ -21,7 +21,7 @@ func sayhelloName(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("key:", k)
 		fmt.Println("val:", strings.Join(v, ""))
 	}
-	fmt.Fprint(w, "hello abc")
+	fmt.Fprint(w, "远程办公视频会议")
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
