@@ -1,0 +1,11 @@
+{
+  "api接口服务端口": "接供任务操作接口",
+  "api_port":8070,
+  "api_read_timeout": 5000,
+  "api_write_timeout": 5000,
+
+  "etcd的集群列表":"多个",
+  "etcd_endpoints": ["127.0.0.1:2379"],
+  "etcd_dial_timeout": 5000
+
+}

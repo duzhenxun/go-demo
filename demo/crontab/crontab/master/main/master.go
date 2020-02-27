@@ -1,0 +1,53 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	"go-demo/demo/crontab/crontab/master"
+	"runtime"
+)
+
+var (
+	confFile string
+)
+
+func initEnv() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+}
+
+func initArgs() {
+	//master -config ./master.json
+	flag.StringVar(&confFile, "config", "./master.json", "master.json")
+	flag.Parse()
+}
+
+func main() {
+	var (
+		err error
+	)
+	//初如化参数
+	initArgs()
+
+	//初始化线程
+	initEnv()
+
+	//加载配置
+	if err = master.InitConfig(confFile); err != nil {
+		goto ERR
+	}
+
+	//任务管理器
+	if err = master.InitJobMgr(); err != nil {
+		goto ERR
+	}
+
+	//启动api http服务
+	if err = master.InitApiServer(); err != nil {
+		goto ERR
+	}
+
+	return
+ERR:
+	fmt.Println(err)
+
+}
