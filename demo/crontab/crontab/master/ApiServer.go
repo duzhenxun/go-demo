@@ -1,7 +1,8 @@
 package master
 
 import (
-	"fmt"
+	"encoding/json"
+	"go-demo/demo/crontab/crontab/common"
 	"net"
 	"net/http"
 	"strconv"
@@ -25,7 +26,11 @@ func InitApiServer() (err error) {
 
 	//配置路由
 	mux = http.NewServeMux()
-	mux.HandleFunc("/job/save", handleJobSave)
+	mux.HandleFunc("/jobs/save", handleJobSave)
+	mux.HandleFunc("/jobs/del", handleJobDelete)
+	mux.HandleFunc("/jobs/list", handleJobList)
+	mux.HandleFunc("/jobs/kill", handleJobKill)
+
 	if listener, err = net.Listen("tcp", ":"+strconv.Itoa(G_config.ApiPort)); err != nil {
 		return
 	}
@@ -48,5 +53,116 @@ func InitApiServer() (err error) {
 
 //保存任务
 func handleJobSave(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "远程办公视频会议")
+	var (
+		err      error
+		postJob  string
+		jobFiled common.Job
+		oldJob   *common.Job
+		result   common.Result
+	)
+	//1解析post表单
+	if err = r.ParseForm(); err != nil {
+		result.SetCode(common.CodeError).SetMsg("表单解析失败")
+		goto ERR
+	}
+
+	//取出表单字段
+	postJob = r.PostForm.Get("job")
+	if err = json.Unmarshal([]byte(postJob), &jobFiled); err != nil {
+		result.SetCode(common.CodeError).SetMsg("表单 job 解析失败")
+		goto ERR
+	}
+
+	//保存到etcd
+	if oldJob, err = G_jobMgr.SaveJob(&jobFiled); err != nil {
+		result.SetCode(common.CodeError).SetMsg(err.Error())
+		goto ERR
+	}
+
+	//返回正常应答
+	result.SetCode(common.CodeSuccess).SetMsg("success").SetData(oldJob)
+	w.Write([]byte(result.ToJson()))
+	return
+ERR:
+	w.Write([]byte(result.ToJson()))
+	return
+}
+
+//删除任务
+func handleJobDelete(w http.ResponseWriter, r *http.Request) {
+	var (
+		err    error
+		name   string
+		result common.Result
+		oldJob *common.Job
+	)
+
+	if err = r.ParseForm(); err != nil {
+		result.SetCode(common.CodeError).SetMsg("xxx")
+		goto ERR
+	}
+
+	name = r.PostForm.Get("name")
+	if name == "" {
+		result.SetCode(common.CodeError).SetMsg("name 不能为空")
+		goto ERR
+	}
+
+	if oldJob, err = G_jobMgr.DeleteJob(name); err != nil {
+		result.SetCode(common.CodeError).SetMsg(err.Error())
+		goto ERR
+	}
+
+	result.SetCode(common.CodeSuccess).SetMsg("success").SetData(oldJob)
+	w.Write([]byte(result.ToJson()))
+	return
+ERR:
+	w.Write([]byte(result.ToJson()))
+	return
+}
+
+func handleJobList(w http.ResponseWriter, r *http.Request) {
+	var (
+		err     error
+		result  common.Result
+		jobList []*common.Job
+	)
+	if jobList, err = G_jobMgr.ListJobs(); err != nil {
+		result.SetCode(common.CodeError).SetMsg(err.Error())
+		goto ERR
+	}
+	result.SetCode(common.CodeSuccess).SetMsg("success").SetData(jobList)
+	w.Write([]byte(result.ToJson()))
+	return
+ERR:
+	w.Write([]byte(result.ToJson()))
+	return
+}
+
+func handleJobKill(w http.ResponseWriter, r *http.Request) {
+	var (
+		err    error
+		result common.Result
+		name   string
+	)
+	if err = r.ParseForm(); err != nil {
+		result.SetCode(common.CodeError).SetMsg("xxx")
+		goto ERR
+	}
+
+	name = r.PostForm.Get("name")
+	if name == "" {
+		result.SetCode(common.CodeError).SetMsg("name 不能为空")
+		goto ERR
+	}
+
+	if err = G_jobMgr.KillJb(name); err != nil {
+		result.SetCode(common.CodeError).SetMsg(err.Error())
+		goto ERR
+	}
+	result.SetCode(common.CodeSuccess).SetMsg("success")
+	w.Write([]byte(result.ToJson()))
+	return
+ERR:
+	w.Write([]byte(result.ToJson()))
 }
