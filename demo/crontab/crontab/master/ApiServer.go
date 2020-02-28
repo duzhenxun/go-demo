@@ -31,6 +31,10 @@ func InitApiServer() (err error) {
 	mux.HandleFunc("/jobs/list", handleJobList)
 	mux.HandleFunc("/jobs/kill", handleJobKill)
 
+	//静态文件
+	staticHandler := http.FileServer(http.Dir(G_config.WebRoot))
+	mux.Handle("/", http.StripPrefix("/", staticHandler))
+
 	if listener, err = net.Listen("tcp", ":"+strconv.Itoa(G_config.ApiPort)); err != nil {
 		return
 	}
@@ -87,7 +91,6 @@ ERR:
 	w.Write([]byte(result.ToJson()))
 	return
 }
-
 //删除任务
 func handleJobDelete(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -120,7 +123,7 @@ ERR:
 	w.Write([]byte(result.ToJson()))
 	return
 }
-
+//列表
 func handleJobList(w http.ResponseWriter, r *http.Request) {
 	var (
 		err     error
@@ -138,7 +141,7 @@ ERR:
 	w.Write([]byte(result.ToJson()))
 	return
 }
-
+//杀死进程
 func handleJobKill(w http.ResponseWriter, r *http.Request) {
 	var (
 		err    error

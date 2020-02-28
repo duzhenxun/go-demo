@@ -16,6 +16,9 @@ type Config struct {
 	//ETCD相关配置
 	EtcdEndpoints   []string `json:"etcd_endpoints"`
 	EtcdDialTimeout int      `json:"etcd_dial_timeout"`
+
+	//静态资源
+	WebRoot string `json:"web_root"`
 }
 
 var (
