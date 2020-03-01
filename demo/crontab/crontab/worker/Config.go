@@ -11,7 +11,7 @@ type Config struct {
 	EtcdDialTimeout int      `json:"etcd_dial_timeout"`
 }
 var(
-	G_config *Config
+	GConfig *Config
 )
 func InitConfig(filename string) (err error)  {
 	var(
@@ -26,5 +26,6 @@ func InitConfig(filename string) (err error)  {
 	if err = json.Unmarshal(content,&conf);err!=nil{
 		return
 	}
+	GConfig = &conf
 	return
 }

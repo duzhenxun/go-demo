@@ -16,14 +16,14 @@ type JobMgr struct {
 }
 
 var (
-	G_jobMgr *JobMgr
+	GJobmgr *JobMgr
 )
 
 func InitJobMgr() (err error) {
 	//配置
 	config := clientv3.Config{
-		Endpoints:   G_config.EtcdEndpoints, //群集地址
-		DialTimeout: time.Duration(G_config.EtcdDialTimeout) * time.Millisecond,
+		Endpoints:   GConfig.EtcdEndpoints, //群集地址
+		DialTimeout: time.Duration(GConfig.EtcdDialTimeout) * time.Millisecond,
 	}
 
 	client, err := clientv3.New(config)
@@ -32,7 +32,7 @@ func InitJobMgr() (err error) {
 	}
 	log.Println(client)
 	//全局
-	G_jobMgr = &JobMgr{
+	GJobmgr = &JobMgr{
 		client: client,
 		kv:     clientv3.NewKV(client),
 		lease:  clientv3.NewLease(client),
@@ -88,7 +88,7 @@ func (j *JobMgr) DeleteJob(name string) (oldJob *common.Job, err error) {
 }
 
 //列表
-func (j *JobMgr) ListJobs()(jobList []*common.Job, err error) {
+func (j *JobMgr) ListJobs() (jobList []*common.Job, err error) {
 	var (
 		dirKey string
 		getRep *clientv3.GetResponse
@@ -99,8 +99,8 @@ func (j *JobMgr) ListJobs()(jobList []*common.Job, err error) {
 	}
 	jobList = make([]*common.Job, 0)
 	for _, v := range getRep.Kvs {
-		job := &common.Job{}
-		if err = json.Unmarshal(v.Value, job); err != nil {
+		job, err := common.UnpackJob(v.Value)
+		if err != nil {
 			err = nil
 			continue
 		}
@@ -110,14 +110,14 @@ func (j *JobMgr) ListJobs()(jobList []*common.Job, err error) {
 }
 
 //杀死任务
-func(j *JobMgr)KillJb(name string) (err error){
-	key:=common.JobKillerDir+name
+func (j *JobMgr) KillJb(name string) (err error) {
+	key := common.JobKillerDir + name
 
-	leaseResp,err:=j.lease.Grant(context.TODO(),1)
-	if err!=nil {
+	leaseResp, err := j.lease.Grant(context.TODO(), 1)
+	if err != nil {
 		return
 	}
-	if _,err = j.kv.Put(context.TODO(),key,"",clientv3.WithLease(leaseResp.ID));err!=nil{
+	if _, err = j.kv.Put(context.TODO(), key, "", clientv3.WithLease(leaseResp.ID)); err != nil {
 		return
 	}
 	return

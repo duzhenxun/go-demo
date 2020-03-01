@@ -22,7 +22,7 @@ type Config struct {
 }
 
 var (
-	G_config *Config
+	GConfig *Config
 )
 
 func InitConfig(filename string) (err error) {
@@ -36,7 +36,7 @@ func InitConfig(filename string) (err error) {
 	if err = json.Unmarshal(content, &conf); err != nil {
 		return
 	}
-	G_config = &conf
-	fmt.Println(G_config)
+	GConfig = &conf
+	fmt.Println(GConfig)
 	return
 }

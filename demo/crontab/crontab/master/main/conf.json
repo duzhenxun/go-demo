@@ -9,6 +9,6 @@
   "etcd_dial_timeout": 5000,
 
   "静态页": "前后端分离",
-  "web_root": "webroot",
+  "web_root": "webroot"
 
 }

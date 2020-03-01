@@ -32,17 +32,17 @@ func InitApiServer() (err error) {
 	mux.HandleFunc("/jobs/kill", handleJobKill)
 
 	//静态文件
-	staticHandler := http.FileServer(http.Dir(G_config.WebRoot))
+	staticHandler := http.FileServer(http.Dir(GConfig.WebRoot))
 	mux.Handle("/", http.StripPrefix("/", staticHandler))
 
-	if listener, err = net.Listen("tcp", ":"+strconv.Itoa(G_config.ApiPort)); err != nil {
+	if listener, err = net.Listen("tcp", ":"+strconv.Itoa(GConfig.ApiPort)); err != nil {
 		return
 	}
 	//创建一个HTTP服务
 	httpServer = &http.Server{
 		Handler:      mux,
-		ReadTimeout:  time.Duration(G_config.ApiReadTimeout) * time.Second,
-		WriteTimeout: time.Duration(G_config.ApiWriteTimeout) * time.Second,
+		ReadTimeout:  time.Duration(GConfig.ApiReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(GConfig.ApiWriteTimeout) * time.Second,
 	}
 	//单例
 	G_apiServer = &ApiServer{
@@ -78,7 +78,7 @@ func handleJobSave(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//保存到etcd
-	if oldJob, err = G_jobMgr.SaveJob(&jobFiled); err != nil {
+	if oldJob, err = GJobmgr.SaveJob(&jobFiled); err != nil {
 		result.SetCode(common.CodeError).SetMsg(err.Error())
 		goto ERR
 	}
@@ -111,7 +111,7 @@ func handleJobDelete(w http.ResponseWriter, r *http.Request) {
 		goto ERR
 	}
 
-	if oldJob, err = G_jobMgr.DeleteJob(name); err != nil {
+	if oldJob, err = GJobmgr.DeleteJob(name); err != nil {
 		result.SetCode(common.CodeError).SetMsg(err.Error())
 		goto ERR
 	}
@@ -130,7 +130,7 @@ func handleJobList(w http.ResponseWriter, r *http.Request) {
 		result  common.Result
 		jobList []*common.Job
 	)
-	if jobList, err = G_jobMgr.ListJobs(); err != nil {
+	if jobList, err = GJobmgr.ListJobs(); err != nil {
 		result.SetCode(common.CodeError).SetMsg(err.Error())
 		goto ERR
 	}
@@ -159,7 +159,7 @@ func handleJobKill(w http.ResponseWriter, r *http.Request) {
 		goto ERR
 	}
 
-	if err = G_jobMgr.KillJb(name); err != nil {
+	if err = GJobmgr.KillJb(name); err != nil {
 		result.SetCode(common.CodeError).SetMsg(err.Error())
 		goto ERR
 	}

@@ -18,7 +18,7 @@ func initEnv() {
 
 func initArgs() {
 	//master -config ./master.json
-	flag.StringVar(&confFile, "config", "./master.json", "master.json")
+	flag.StringVar(&confFile, "config", "./conf.json", "conf.json")
 	flag.Parse()
 }
 

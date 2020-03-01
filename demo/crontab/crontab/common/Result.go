@@ -6,8 +6,7 @@ const (
 	CodeSuccess int    = 1
 	CodeError   int    = -1
 	NoAuth      int    = 401
-	JobSaveDir  string = "/cron/jobs/"
-	JobKillerDir  string = "/cron/killer/"
+
 )
 
 type Result struct {
