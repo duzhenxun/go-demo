@@ -13,7 +13,7 @@ import (
 func sayhelloName(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	fmt.Println(r.Form)
-	
+
 	fmt.Println(r.URL.Scheme)
 	fmt.Println(r.URL.Path)
 	fmt.Println(r.Form["url_long"])
