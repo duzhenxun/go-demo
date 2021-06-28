@@ -3,6 +3,14 @@ github.com/andlabs/ui
 github.com/andlabs/ui/winmanifest
 # github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da
 github.com/armon/go-metrics
+# github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310
+github.com/armon/go-radix
+# github.com/bgentry/speakeasy v0.1.0
+github.com/bgentry/speakeasy
+# github.com/bitly/go-simplejson v0.5.0
+github.com/bitly/go-simplejson
+# github.com/buger/jsonparser v1.1.1
+github.com/buger/jsonparser
 # github.com/coreos/etcd v3.3.10+incompatible
 github.com/coreos/etcd/auth/authpb
 github.com/coreos/etcd/clientv3
@@ -12,6 +20,8 @@ github.com/coreos/etcd/mvcc/mvccpb
 github.com/coreos/etcd/pkg/types
 # github.com/dontpanic92/wxGo v0.0.0-20181107055819-fbf544604121
 github.com/dontpanic92/wxGo/wx
+# github.com/fatih/color v1.7.0
+github.com/fatih/color
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
 # github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3
@@ -51,10 +61,14 @@ github.com/gorhill/cronexpr
 github.com/gorilla/websocket
 # github.com/hashicorp/consul/api v1.2.0
 github.com/hashicorp/consul/api
+# github.com/hashicorp/errwrap v1.0.0
+github.com/hashicorp/errwrap
 # github.com/hashicorp/go-cleanhttp v0.5.1
 github.com/hashicorp/go-cleanhttp
 # github.com/hashicorp/go-immutable-radix v1.0.0
 github.com/hashicorp/go-immutable-radix
+# github.com/hashicorp/go-multierror v1.0.0
+github.com/hashicorp/go-multierror
 # github.com/hashicorp/go-rootcerts v1.0.0
 github.com/hashicorp/go-rootcerts
 # github.com/hashicorp/golang-lru v0.5.0
@@ -82,8 +96,12 @@ github.com/lxn/walk
 github.com/lxn/win
 # github.com/magiconair/properties v1.8.1
 github.com/magiconair/properties
+# github.com/mattn/go-colorable v0.0.9
+github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.7
 github.com/mattn/go-isatty
+# github.com/mitchellh/cli v1.0.0
+github.com/mitchellh/cli
 # github.com/mitchellh/go-homedir v1.0.0
 github.com/mitchellh/go-homedir
 # github.com/mitchellh/mapstructure v1.1.2
@@ -94,6 +112,11 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/pelletier/go-toml v1.2.0
 github.com/pelletier/go-toml
+# github.com/posener/complete v1.1.1
+github.com/posener/complete
+github.com/posener/complete/cmd
+github.com/posener/complete/cmd/install
+github.com/posener/complete/match
 # github.com/spf13/afero v1.1.2
 github.com/spf13/afero
 github.com/spf13/afero/mem
@@ -111,6 +134,17 @@ github.com/subosito/gotenv
 github.com/ugorji/go/codec
 # github.com/xs25cn/scanPort v0.0.0-20200114082402-de773d2b0349
 github.com/xs25cn/scanPort/scan
+# go.uber.org/atomic v1.4.0
+go.uber.org/atomic
+# go.uber.org/multierr v1.1.0
+go.uber.org/multierr
+# go.uber.org/zap v1.10.0
+go.uber.org/zap
+go.uber.org/zap/buffer
+go.uber.org/zap/internal/bufferpool
+go.uber.org/zap/internal/color
+go.uber.org/zap/internal/exit
+go.uber.org/zap/zapcore
 # golang.org/x/net v0.0.0-20190923162816-aa69164e4478
 golang.org/x/net/context
 golang.org/x/net/html
@@ -176,5 +210,7 @@ gopkg.in/Knetic/govaluate.v3
 gopkg.in/go-playground/validator.v8
 # gopkg.in/ini.v1 v1.51.0
 gopkg.in/ini.v1
+# gopkg.in/natefinch/lumberjack.v2 v2.0.0
+gopkg.in/natefinch/lumberjack.v2
 # gopkg.in/yaml.v2 v2.2.4
 gopkg.in/yaml.v2

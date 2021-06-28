@@ -24,6 +24,7 @@ func main() {
 		for k, v := range data {
 			fmt.Println(k, v[0])
 		}
+		fmt.Println(request.Header.Get("Referer"));
 		//fmt.Println(data.Get("name"))
 
 	})

@@ -2,53 +2,50 @@ package main
 
 import (
 	"fmt"
-	redigo "github.com/gomodule/redigo/redis"
 	"github.com/go-redis/redis"
+	redigo "github.com/gomodule/redigo/redis"
 	"time"
 )
 
 func main() {
 	var addr = "127.0.0.1:6379"
 	var password = ""
-
 	//baseRedis(addr,password)
 	pool := PoolInitRedis(addr, password)
 	time.Sleep(time.Second * 5) //redis中查看有多少连接
 
-	c := pool.Get()
-	c2:=pool.Get()
-	c3:=pool.Get()
-	c4:=pool.Get()
-	c5:=pool.Get()
-	fmt.Println(c,c2,c3,c4,c5)
-	//time.Sleep(time.Second * 5)//redis一共有多少个连接？？
-/*	c.Close()
+	c1 := pool.Get()
+	c2 := pool.Get()
+	c3 := pool.Get()
+	c4 := pool.Get()
+	c5 := pool.Get()
+	fmt.Println(c1, c2, c3, c4, c5)
+	time.Sleep(time.Second * 5) //redis一共有多少个连接？？
+	c1.Close()
 	c2.Close()
 	c3.Close()
 	c4.Close()
-	c5.Close()*/
-	//time.Sleep(time.Second*5) //redis一共有多少个连接？？
+	c5.Close()
+	time.Sleep(time.Second * 5) //redis一共有多少个连接？？*/
 
-/*	//下次是怎么取出来的？？
-	b1:=pool.Get()
-	b2:=pool.Get()
-	b3:=pool.Get()
-	fmt.Println(b1,b2,b3) //当前都是哪些连接？
-	time.Sleep(time.Second*5)
-	b1.Close()
-	b2.Close()
-	b3.Close()*/
+	//下次是怎么取出来的？？
+	b1 := pool.Get()
+	b2 := pool.Get()
+	b3 := pool.Get()
+	fmt.Println(b1, b2, b3) //当前都是哪些连接？
+	time.Sleep(time.Second * 5)
+	/*	b1.Close()
+		b2.Close()
+		b3.Close()*/
 
-	for{
+	for {
 		fmt.Println("主程序运行中....")
-		time.Sleep(time.Second*1) //redis一共有多少个连接？？
+		time.Sleep(time.Second * 1) //redis一共有多少个连接？？
 	}
 
 }
 
-
-//连接池
-// redis pool
+// PoolInitRedis 连接池
 func PoolInitRedis(server string, password string) *redigo.Pool {
 	return &redigo.Pool{
 		MaxIdle:     2,
@@ -70,7 +67,6 @@ func PoolInitRedis(server string, password string) *redigo.Pool {
 	}
 }
 
-
 //基本写法
 func baseRedis(addr string, password string) {
 	c := redis.NewClient(&redis.Options{
@@ -91,4 +87,3 @@ func baseRedis(addr string, password string) {
 	c.Close()
 	time.Sleep(time.Second * 2)
 }
-

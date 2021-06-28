@@ -34,7 +34,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	hello2 "go-demo/demo/grpc/proto/hello"
+	"go-demo/demo/consul"
+	"go-demo/demo/grpc/proto/hello"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -42,6 +43,7 @@ import (
 	"google.golang.org/grpc/status"
 	"log"
 	"net"
+	"time"
 )
 
 var (
@@ -54,7 +56,7 @@ func main() {
 
 	//注册可用服务,服务中的fun1需要token验证,fun2可以直接访问
 	grpcServer := grpc.NewServer()
-	hello2.RegisterHelloServiceServer(grpcServer, &helloService{})
+	hello.RegisterHelloServiceServer(grpcServer, &helloService{})
 
 	//监听端口
 	log.Printf("starting  service at %d", *port)
@@ -66,12 +68,12 @@ func main() {
 	reflection.Register(grpcServer)
 
 	// 注册到concul中
-	/*	if err = consul.Register("test.hello.fun1", "10.70.120.63", *port, "10.70.120.63:8500", time.Second*10, 15);err!=nil{
-			panic(err)
-		}
-		if err = consul.Register("test.hello.fun2", "10.70.120.63", *port, "10.70.120.63:8500", time.Second*10, 15);err!=nil{
-			panic(err)
-		}*/
+	if err = consul.Register("test.hello.fun1", "127.0.0.1", *port, "127.0.0.1:8500", time.Second*10, 15); err != nil {
+		panic(err)
+	}
+	if err = consul.Register("test.hello.fun2", "127.0.0.1", *port, "127.0.0.1:8500", time.Second*10, 15); err != nil {
+		panic(err)
+	}
 
 	grpcServer.Serve(lis)
 
@@ -82,10 +84,10 @@ type helloService struct {
 }
 
 //需要token认证
-func (this *helloService) Fun1(ctx context.Context, in *hello2.Request) (*hello2.Response, error) {
+func (this *helloService) Fun1(ctx context.Context, in *hello.Request) (*hello.Response, error) {
 	auth := Auth{}
 	if err := auth.Check(ctx); err != nil {
-		return &hello2.Response{Message: err.Error()}, nil
+		return &hello.Response{Message: err.Error()}, nil
 	}
 	//设置时间防止客户端已断开,服务端还在傻傻的执行
 	//https://book.eddycjy.com/golang/grpc/deadlines.html
@@ -93,14 +95,14 @@ func (this *helloService) Fun1(ctx context.Context, in *hello2.Request) (*hello2
 		return nil, errors.New("客户端已断开")
 	}
 	fmt.Printf("fun1 name:%v\n", in.Name)
-	return &hello2.Response{Message: "fun1 hello " + in.Name}, nil
+	return &hello.Response{Message: "fun1 hello " + in.Name}, nil
 }
 
 //直接可以访问
-func (this *helloService) Fun2(ctx context.Context, in *hello2.Request) (*hello2.Response, error) {
+func (this *helloService) Fun2(ctx context.Context, in *hello.Request) (*hello.Response, error) {
 
 	fmt.Printf("fun2 name:%v\n", in.Name)
-	return &hello2.Response{Message: "fun2 hello " + in.Name}, nil
+	return &hello.Response{Message: "fun2 hello " + in.Name}, nil
 }
 
 type Auth struct {

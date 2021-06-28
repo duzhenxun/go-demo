@@ -22,11 +22,15 @@ func main()  {
 		})
 	})
 	r.GET("/test",func(c *gin.Context){
-		fmt.Println(c.GetQuery("abc"))
+		c.JSON(200, map[string]interface{}{"aaa":161526996100001290})
 
 	})
 	r.GET("/mysql", mysql)
-
+	r.GET("int", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
 	r.Run(*addr) // listen and serve on 0.0.0.0:8080
 }
 
