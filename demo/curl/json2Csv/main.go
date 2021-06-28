@@ -94,7 +94,7 @@ func main() {
 		fmt.Println("创建新文件")
 	}
 
-	fmt.Println("打开文件")
+	//打开文件，追加数据
 	file, err = os.OpenFile(fileName, os.O_APPEND|os.O_RDWR, 0666)
 	defer file.Close()
 	if err != nil {
