@@ -2,6 +2,7 @@ package wsConn
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"sync"
@@ -12,7 +13,7 @@ type wsMessage struct {
 	messageType int
 	data        []byte
 }
-type wsConnection struct {
+type WsConnection struct {
 	wsSocket *websocket.Conn
 	inChan   chan *wsMessage
 	outChan  chan *wsMessage
@@ -23,7 +24,7 @@ type wsConnection struct {
 	isClosed  bool
 }
 
-func NewWsConn(w http.ResponseWriter, r *http.Request) (*wsConnection, error) {
+func NewWsConn(w http.ResponseWriter, r *http.Request) (*WsConnection, error) {
 	wsUp := websocket.Upgrader{
 		HandshakeTimeout: time.Second * 5,
 		CheckOrigin: func(r *http.Request) bool {
@@ -35,7 +36,7 @@ func NewWsConn(w http.ResponseWriter, r *http.Request) (*wsConnection, error) {
 		return nil, err
 	}
 	//初始化
-	wsConn := &wsConnection{
+	wsConn := &WsConnection{
 		wsSocket:  wsSocket,
 		inChan:    make(chan *wsMessage, 1000),
 		outChan:   make(chan *wsMessage, 1000),
@@ -45,27 +46,28 @@ func NewWsConn(w http.ResponseWriter, r *http.Request) (*wsConnection, error) {
 	return wsConn, nil
 }
 
-func (wsConn *wsConnection) Init(){
+func (s *WsConnection) Init() {
 	// 心跳检测
-	go wsConn.ping()
+	//go wsConn.ping()
 	// 读
-	go wsConn.readLoop()
+	go s.readLoop()
 	// 写
-	go wsConn.writeLoop()
+	go s.writeLoop()
 }
 
 // 阻塞读取客户端发来的消息
 // 如果没有消息发送过来就一直阻塞
-func (wsConn *wsConnection) readLoop() {
+func (s *WsConnection) readLoop() {
 	for {
-		msgType, data, err := wsConn.wsSocket.ReadMessage()
+		msgType, data, err := s.wsSocket.ReadMessage()
+		fmt.Println(msgType, string(data))
 		if err != nil {
-			wsConn.Close()
+			s.Close()
 			return
 		}
 		select {
-		case wsConn.inChan <- &wsMessage{messageType: msgType, data: data}:
-		case <-wsConn.closeChan:
+		case s.inChan <- &wsMessage{messageType: msgType, data: data}:
+		case <-s.closeChan:
 			return
 		}
 	}
@@ -73,60 +75,73 @@ func (wsConn *wsConnection) readLoop() {
 }
 
 //从出通道中取信息发给客户端
-func (wsConn *wsConnection) writeLoop() {
+func (s *WsConnection) writeLoop() {
 	for {
 		select {
-		case msg := <-wsConn.outChan:
+		case msg := <-s.outChan:
 			// 发送给客户端
-			if err := wsConn.wsSocket.WriteMessage(msg.messageType, msg.data); err != nil {
-				wsConn.Close()
+			if err := s.wsSocket.WriteMessage(msg.messageType, msg.data); err != nil {
+				s.Close()
 				return
 			}
-		case <-wsConn.closeChan:
+		case <-s.closeChan:
 			return
 		}
 	}
 }
 
 // 心跳检测
-func (wsConn *wsConnection) ping() {
+func (s *WsConnection) ping() {
 	for {
 		time.Sleep(time.Second * 2)
-		if err := wsConn.WriteMsg(websocket.TextMessage, []byte("ping")); err != nil {
-			wsConn.Close()
+		if err := s.WriteMsg(websocket.TextMessage, []byte("ping")); err != nil {
+			s.Close()
 		}
 	}
 }
+func (s *WsConnection) ApiWriteMsg(messageType int, data []byte) error {
+	msg := wsMessage{
+		messageType: messageType,
+		data:        data,
+	}
+	fmt.Println(msg)
+	s.outChan <- &msg
+	return nil
+}
 
 // 往通道中写信息
-func (wsConn *wsConnection) WriteMsg(messageType int, data []byte) error {
+func (s *WsConnection) WriteMsg(messageType int, data []byte) error {
 	select {
-	case wsConn.outChan <- &wsMessage{messageType: messageType, data: data}:
+	case s.outChan <- &wsMessage{messageType: messageType, data: data}:
 		return nil
-	case <-wsConn.closeChan:
+	case <-s.closeChan:
 		return errors.New("websocket closed")
 	}
 }
 
 // 从通道中读取信息
-func (wsConn *wsConnection) ReadMsg() (*wsMessage, error) {
+func (s *WsConnection) ReadMsg() (*wsMessage, error) {
 	select {
-	case msg := <-wsConn.inChan:
+	case msg := <-s.inChan:
+		//写入输出通道
+		fmt.Println("写信息", msg)
+		err := s.WriteMsg(msg.messageType, msg.data)
+		fmt.Println(err)
 		return msg, nil
-	case <-wsConn.closeChan:
+	case <-s.closeChan:
 		return nil, errors.New("websocket closed")
 	}
 }
 
 // 关闭socket连接，关闭通道
-func (wsConn *wsConnection) Close() {
-	wsConn.wsSocket.Close()
+func (s *WsConnection) Close() {
+	s.wsSocket.Close()
 
-	wsConn.mutex.Lock()
-	defer wsConn.mutex.Unlock()
-	if !wsConn.isClosed {
-		close(wsConn.closeChan)
-		wsConn.isClosed = true
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+	if !s.isClosed {
+		close(s.closeChan)
+		s.isClosed = true
 	}
 
 }

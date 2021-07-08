@@ -11,7 +11,6 @@ func main() {
 	pprofServeMux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
 	pprofServeMux.HandleFunc("/debug/pprof/profile", pprof.Profile)
 	pprofServeMux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-
 	http.ListenAndServe(":16969", pprofServeMux)
 
 }
