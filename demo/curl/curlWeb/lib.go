@@ -30,7 +30,7 @@ func start(fileName string, url string) {
 	if count := strings.Index(tmpUrl, "?"); count == -1 {
 		tmpUrl = tmpUrl + "?"
 	}
-	wConn.WriteMessage(1, []byte(fmt.Sprintf("===================  准备下载数据: "+fileName+" =================\n     %s\n", tmpUrl)))
+	wConn.WriteMessage(1, []byte("=================== 数据下载 Start ===================\n"))
 	log.Printf("准备下载数据...  %s\n", tmpUrl)
 	//time.Sleep(1 * time.Second)
 	//默认拼上page=1
@@ -71,7 +71,9 @@ func start(fileName string, url string) {
 				if err != nil {
 					fmt.Println(err)
 				}
-				wConn.WriteMessage(1, []byte(fmt.Sprintf("  恭喜,数据下载完成! %s\n", saveFileName)))
+				wConn.WriteMessage(1, []byte("  ^_^ 恭喜！！！数据下载完成......"))
+				wConn.WriteMessage(1, []byte(fmt.Sprintf("  文件地址：%s\n", saveFileName)))
+				wConn.WriteMessage(1, []byte("=================== 数据下载 End ===================\n"))
 			}
 
 			break
@@ -140,8 +142,7 @@ func saveData(tmpFileName string, tempMap Res, page int) (filePath string, fileN
 		w.Flush()
 		file.Close()
 		time.Sleep(2 * time.Second)
-		//log.Printf("创建文件：%s\n", fileName)
-		wConn.WriteMessage(1, []byte(fmt.Sprintf("创建文件：%s", fileName)))
+		wConn.WriteMessage(1, []byte(fmt.Sprintf("  创建文件：%s", fileName)))
 	}
 
 	//打开文件，追加数据

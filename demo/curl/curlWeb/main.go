@@ -55,13 +55,13 @@ func main() {
 	//fmt.Println(serverUri)
 	openErr := Open(serverUri)
 	if openErr != nil {
-		fmt.Println(openErr)
+		fmt.Println(openErr, serverUri)
 	}
 	//绑定路由地址
 	http.HandleFunc("/", indexHandle)
 	http.HandleFunc("/down", downHandle)
 	http.HandleFunc("/ws", wsHandle)
-	log.Println("http://127.0.0.1" + addr + " 服务已启动...")
+	log.Println(" ^_^ 活动小助手 服务已启动...")
 	http.ListenAndServe(addr, nil)
 }
 func indexHandle(w http.ResponseWriter, r *http.Request) {
